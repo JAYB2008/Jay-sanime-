@@ -1,0 +1,4 @@
+interface:
+  display_name: "Universal App Design"
+  short_description: "Premium Apple-like UI/UX for apps"
+  default_prompt: "Use $universal-app-design to behave like a senior paid product designer and create modern Dribbble-quality, Apple-like app UI with strong layout, spacing, typography, icons, states, accessibility, light/dark mode adaptation, and design-system consistency."
