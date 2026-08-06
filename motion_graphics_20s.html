@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>20s HD Motion Graphics</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    .note {
+      position: fixed;
+      right: 16px;
+      bottom: 12px;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      letter-spacing: .04em;
+      user-select: none;
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,.5);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <div class="note">Loop: 20 seconds • HD ready</div>
+
+  <script>
+    const DURATION = 20; // seconds
+    const canvas = document.getElementById('scene');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function easeInOutSine(x) {
+      return -(Math.cos(Math.PI * x) - 1) / 2;
+    }
+
+    function draw(timeMs) {
+      const t = (timeMs / 1000) % DURATION;
+      const p = t / DURATION;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // Animated gradient background
+      const bgShift = Math.sin(p * Math.PI * 2) * 0.5 + 0.5;
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, `hsl(${220 + bgShift * 80}, 85%, 10%)`);
+      grad.addColorStop(0.5, `hsl(${280 + bgShift * 60}, 80%, 12%)`);
+      grad.addColorStop(1, `hsl(${340 + bgShift * 70}, 85%, 8%)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Soft vignette
+      const vg = ctx.createRadialGradient(cx, cy, Math.min(w, h) * 0.2, cx, cy, Math.max(w, h) * 0.75);
+      vg.addColorStop(0, 'rgba(0,0,0,0)');
+      vg.addColorStop(1, 'rgba(0,0,0,0.38)');
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, w, h);
+
+      // Orbiting particles
+      const layers = 4;
+      for (let l = 0; l < layers; l++) {
+        const count = 45 + l * 20;
+        const baseR = Math.min(w, h) * (0.15 + l * 0.11);
+        const speed = (0.45 + l * 0.22) * (l % 2 === 0 ? 1 : -1);
+        for (let i = 0; i < count; i++) {
+          const n = i / count;
+          const a = n * Math.PI * 2 + p * Math.PI * 2 * speed;
+          const wobble = Math.sin((p * 2 + n * 6 + l) * Math.PI * 2) * (10 + l * 8);
+          const x = cx + Math.cos(a) * (baseR + wobble);
+          const y = cy + Math.sin(a) * (baseR + wobble * 0.6);
+          const size = 1 + ((i * 13 + l * 11) % 6) * 0.35;
+          const alpha = 0.22 + 0.58 * (0.5 + 0.5 * Math.sin(a * 3 + p * Math.PI * 2));
+          ctx.fillStyle = `hsla(${190 + l * 38 + (n * 80)}, 100%, ${55 + l * 5}%, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Central pulse rings
+      const rings = 8;
+      for (let i = 0; i < rings; i++) {
+        const ringP = (p + i / rings) % 1;
+        const e = easeInOutSine(ringP);
+        const r = e * Math.min(w, h) * 0.48;
+        const a = (1 - ringP) * 0.45;
+        ctx.strokeStyle = `hsla(${200 + i * 18}, 95%, 70%, ${a})`;
+        ctx.lineWidth = 1 + i * 0.18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Rotating wireframe starburst
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(p * Math.PI * 2 * 0.35);
+      const spokes = 96;
+      for (let i = 0; i < spokes; i++) {
+        const a = (i / spokes) * Math.PI * 2;
+        const len = Math.min(w, h) * (0.12 + 0.14 * (0.5 + 0.5 * Math.sin(i * 0.6 + p * Math.PI * 4)));
+        ctx.strokeStyle = `hsla(${260 + i * 1.8}, 90%, 72%, 0.34)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 18, Math.sin(a) * 18);
+        ctx.lineTo(Math.cos(a) * len, Math.sin(a) * len);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Title pulse
+      const glow = 12 + 18 * (0.5 + 0.5 * Math.sin(p * Math.PI * 8));
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `700 ${Math.max(36, Math.min(w, h) * 0.07)}px Inter, sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.96)';
+      ctx.shadowColor = 'rgba(120,220,255,0.9)';
+      ctx.shadowBlur = glow;
+      ctx.fillText('MOTION GRAPHICS', cx, cy);
+      ctx.shadowBlur = 0;
+
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
