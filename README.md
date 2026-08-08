@@ -97,3 +97,24 @@ This is especially useful when an app was originally built only in dark mode and
 ## Notes
 
 This repository contains documentation/configuration for the skill only. It does not include a runnable app.
+
+---
+
+# NexusForge AI Behavior Skill Set
+
+This repository also includes a complete NexusForge skill pack for game-building AI behavior:
+
+```text
+nexusforge-ai-behavior/
+├── SKILL.md
+└── skills/
+    ├── 01-conversational-memory-and-reasoning.md
+    ├── 02-clarifying-question-behavior.md
+    ├── 03-genre-specific-game-design-knowledge.md
+    ├── 04-code-generation-and-output-discipline.md
+    ├── 05-iterative-change-handling.md
+    ├── 06-output-format-reliability.md
+    └── 07-manual-builder-assistant-behavior.md
+```
+
+The NexusForge pack is written for an AI-first game creation platform where the assistant must behave like a real game developer: preserving conversation state, asking focused clarifying questions, applying genre-specific game design craft, writing code only into a structured Code Space payload, preserving existing games during iterative edits, returning reliable JSON, and supporting a lighter Manual Builder scene-editing mode.
